@@ -486,6 +486,21 @@
             }
         }
 
+        .icon--calendar {
+            @include opacity(.5);
+            @include single-transition(all, .15s);
+            cursor: pointer;
+
+            &:hover {
+                @include opacity(.7);
+            }
+
+            svg {
+                position: relative;
+                top: 2px;
+            }
+        }
+
         .icon--emoji {
             @include opacity(.5);
             @include single-transition(all, .15s);
