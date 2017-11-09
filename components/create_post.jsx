@@ -25,6 +25,7 @@ import * as UserAgent from 'utils/user_agent.jsx';
 import * as Utils from 'utils/utils.jsx';
 
 import EmojiPickerOverlay from 'components/emoji_picker/emoji_picker_overlay.jsx';
+import CalendarSchedulerOverlay from 'components/calendar_scheduler/calendar_scheduler_overlay.jsx';
 
 import ConfirmModal from './confirm_modal.jsx';
 import FilePreview from './file_preview.jsx';
@@ -68,6 +69,7 @@ export default class CreatePost extends React.Component {
         this.showPostDeletedModal = this.showPostDeletedModal.bind(this);
         this.hidePostDeletedModal = this.hidePostDeletedModal.bind(this);
         this.showShortcuts = this.showShortcuts.bind(this);
+        this.handleCalendarSelection = this.handleCalendarSelection.bind(this);
         this.handleEmojiClick = this.handleEmojiClick.bind(this);
         this.handlePostError = this.handlePostError.bind(this);
         this.hideNotifyAllModal = this.hideNotifyAllModal.bind(this);
@@ -95,6 +97,7 @@ export default class CreatePost extends React.Component {
             showTutorialTip: false,
             showPostDeletedModal: false,
             enableSendButton: false,
+            showCalendarScheduler: false,
             showEmojiPicker: false,
             showConfirmModal: false,
             totalMembers: members
@@ -107,8 +110,16 @@ export default class CreatePost extends React.Component {
         this.setState({postError});
     }
 
+    toggleCalendarScheduler = () => {
+        this.setState({showCalendarScheduler: !this.state.showCalendarScheduler});
+    }
+
     toggleEmojiPicker = () => {
         this.setState({showEmojiPicker: !this.state.showEmojiPicker});
+    }
+
+    hideCalendarScheduler = () => {
+        this.setState({showCalendarScheduler: false});
     }
 
     hideEmojiPicker = () => {
@@ -563,6 +574,14 @@ export default class CreatePost extends React.Component {
         });
     }
 
+    handleCalendarSelection(timeSlot) {
+        const start = timeSlot.start.toLocaleString();
+        const end = timeSlot.end.toLocaleString();
+
+        this.setState({message: 'Your meeting is scheduled to start at ' + start + ' and end at ' + end});
+        this.setState({showCalendarScheduler: false});
+    }
+
     handleEmojiClick(emoji) {
         const emojiAlias = emoji.name || emoji.aliases[0];
 
@@ -703,6 +722,28 @@ export default class CreatePost extends React.Component {
             />
         );
 
+        let calendarPicker = null;
+
+        calendarPicker = (
+            <span className='calendar-picker__container'>
+                <CalendarSchedulerOverlay
+                    show={this.state.showCalendarScheduler}
+                    container={this.props.getChannelView}
+                    target={this.getCreatePostControls}
+                    onHide={this.hideCalendarScheduler}
+                    onDateSelect={this.handleCalendarSelection}
+                    rightOffset={150}
+                    topOffset={-7}
+                />
+                <span
+                    id='calendarPickerButton'
+                    className={'icon icon--calendar ' + (this.state.showCalendarScheduler ? 'active' : '')}
+                    dangerouslySetInnerHTML={{__html: Constants.CALENDAR_ICON_SVG}}
+                    onClick={this.toggleCalendarScheduler}
+                />
+            </span>
+        );
+
         let emojiPicker = null;
         if (window.mm_config.EnableEmojiPicker === 'true') {
             emojiPicker = (
@@ -755,6 +796,7 @@ export default class CreatePost extends React.Component {
                                 ref='createPostControls'
                                 className='post-body__actions'
                             >
+                                {calendarPicker}
                                 {fileUpload}
                                 {emojiPicker}
                                 <a
