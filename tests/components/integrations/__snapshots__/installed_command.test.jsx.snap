@@ -220,7 +220,7 @@ exports[`components/integrations/InstalledCommand should call onRegenToken funct
             }
           >
             <span>
-              Created by username on Tuesday, July 11, 2017
+              Created by username on Monday, July 10, 2017
             </span>
           </FormattedMessage>
         </span>
