@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {browserHistory} from 'react-router/es6';
+import {browserHistory} from 'react-router';
 
 import iNoBounce from 'inobounce';
 
@@ -29,10 +29,10 @@ import * as Utils from 'utils/utils.jsx';
 
 import AnnouncementBar from 'components/announcement_bar';
 import DeletePostModal from 'components/delete_post_modal.jsx';
-import EditPostModal from 'components/edit_post_modal.jsx';
-import GetPostLinkModal from 'components/get_post_link_modal.jsx';
-import GetPublicLinkModal from 'components/get_public_link_modal.jsx';
+import EditPostModal from 'components/edit_post_modal';
+import GetPostLinkModal from 'components/get_post_link_modal';
 import GetTeamInviteLinkModal from 'components/get_team_invite_link_modal';
+import GetPublicLinkModal from 'components/get_public_link_modal';
 import InviteMemberModal from 'components/invite_member_modal.jsx';
 import LeaveTeamModal from 'components/leave_team_modal.jsx';
 import LeavePrivateChannelModal from 'components/modals/leave_private_channel_modal.jsx';
@@ -76,6 +76,7 @@ export default class NeedsTeam extends React.Component {
 
         this.onTeamChanged = this.onTeamChanged.bind(this);
         this.onPreferencesChanged = this.onPreferencesChanged.bind(this);
+        this.shortcutKeyDown = this.shortcutKeyDown.bind(this);
 
         this.blurTime = new Date().getTime();
 
@@ -85,6 +86,16 @@ export default class NeedsTeam extends React.Component {
             team,
             theme: PreferenceStore.getTheme(team.id)
         };
+    }
+
+    shortcutKeyDown(e) {
+        if (e.shiftKey && e.ctrlKey && e.keyCode === Constants.KeyCodes.L) {
+            if (document.getElementById('sidebar-right').className.match('sidebar--right sidebar--right--expanded')) {
+                document.getElementById('reply_textbox').focus();
+            } else {
+                document.getElementById('post_textbox').focus();
+            }
+        }
     }
 
     onTeamChanged() {
@@ -146,6 +157,7 @@ export default class NeedsTeam extends React.Component {
             // Use iNoBounce to prevent scrolling past the boundaries of the page
             iNoBounce.enable();
         }
+        document.addEventListener('keydown', this.shortcutKeyDown);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -165,6 +177,7 @@ export default class NeedsTeam extends React.Component {
         }
         stopPeriodicStatusUpdates();
         stopPeriodicSync();
+        document.removeEventListener('keydown', this.shortcutKeyDown);
     }
 
     render() {

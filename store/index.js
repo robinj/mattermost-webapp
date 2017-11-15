@@ -4,15 +4,19 @@
 import {batchActions} from 'redux-batched-actions';
 import {createTransform, persistStore} from 'redux-persist';
 
-import localForage from 'localforage';
+import localForage from "localforage";
+import { extendPrototype } from "localforage-observable";
 
 import {General, RequestStatus} from 'mattermost-redux/constants';
 import configureServiceStore from 'mattermost-redux/store';
 import reduxInitialState from 'mattermost-redux/store/initial_state';
 
+import {storageRehydrate} from 'actions/storage';
+
 import appReducer from 'reducers';
 
 import {transformSet} from './utils';
+import {detect} from 'utils/network.js';
 
 function getAppReducer() {
     return require('../reducers'); // eslint-disable-line global-require
@@ -34,7 +38,7 @@ const setTransforms = [
     ...teamSetTransform
 ];
 
-export default function configureStore(initialState) {
+export default function configureStore(initialState, persistorStorage = null) {
     const setTransformer = createTransform(
         (inboundState, key) => {
             if (key === 'entities') {
@@ -68,13 +72,37 @@ export default function configureStore(initialState) {
 
     const offlineOptions = {
         persist: (store, options) => {
-            const persistor = persistStore(store, {storage: localForage, ...options}, () => {
+            const localforage = extendPrototype(localForage);
+            var storage = persistorStorage || localforage;
+            const KEY_PREFIX = "reduxPersist:";
+            const persistor = persistStore(store, {storage, keyPrefix: KEY_PREFIX, ...options}, () => {
                 store.dispatch({
                     type: General.STORE_REHYDRATION_COMPLETE,
                     complete: true
                 });
             });
+            if (localforage === storage) {
+                localforage.ready(() => {
+                    localforage.configObservables({
+                        crossTabNotification: true,
+                    });
+                    var observable = localforage.newObservable({
+                        crossTabNotification: true,
+                        changeDetection: true
+                    });
+                    observable.subscribe({
+                        next: (args) => {
+                            if(args.key && args.key.indexOf(KEY_PREFIX) === 0){
+                                const keyspace = args.key.substr(KEY_PREFIX.length);
 
+                                var statePartial = {};
+                                statePartial[keyspace] = args.newValue;
+                                storageRehydrate(statePartial)(store.dispatch, store.getState());
+                            }
+                        }
+                    })
+                })
+            }
             let purging = false;
 
             // check to see if the logout request was successful
@@ -112,7 +140,8 @@ export default function configureStore(initialState) {
             transforms: [
                 setTransformer
             ]
-        }
+        },
+        detectNetwork: detect
     };
 
     return configureServiceStore({}, appReducer, offlineOptions, getAppReducer, {enableBuffer: false});

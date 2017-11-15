@@ -40,8 +40,8 @@ export default class Textbox extends React.Component {
         suggestionListStyle: PropTypes.string,
         emojiEnabled: PropTypes.bool,
         isRHS: PropTypes.bool,
-        popoverMentionKeyClick: React.PropTypes.bool,
-        characterLimit: React.PropTypes.number
+        popoverMentionKeyClick: PropTypes.bool,
+        characterLimit: PropTypes.number
     };
 
     static defaultProps = {
@@ -280,7 +280,7 @@ export default class Textbox extends React.Component {
                     className='form-control custom-textarea textbox-preview-area'
                     style={{display: this.state.preview ? 'block' : 'none'}}
                 >
-                    {PostUtils.postMessageHtmlToComponent(TextFormatting.formatText(this.props.value, options))}
+                    {PostUtils.postMessageHtmlToComponent(TextFormatting.formatText(this.props.value, options), this.props.isRHS)}
                 </div>
             );
         }

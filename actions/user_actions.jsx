@@ -1,7 +1,7 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {browserHistory} from 'react-router/es6';
+import {browserHistory} from 'react-router';
 
 import {getChannelAndMyMember} from 'mattermost-redux/actions/channels';
 import {getClientConfig, getLicenseConfig} from 'mattermost-redux/actions/general';
@@ -524,6 +524,19 @@ export async function updatePassword(userId, currentPassword, newPassword, succe
     } else if (err && error) {
         error({id: err.server_error_id, ...err});
     }
+}
+
+export function revokeAllSessions(userId, success, error) {
+    UserActions.revokeAllSessionsForUser(userId)(dispatch, getState).then(
+        (data) => {
+            if (data && success) {
+                success(data);
+            } else if (data == null && error) {
+                const serverError = getState().requests.users.updateUser.error;
+                error({id: serverError.server_error_id, ...serverError});
+            }
+        }
+    );
 }
 
 export async function verifyEmail(token, success, error) {

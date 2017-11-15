@@ -1,6 +1,7 @@
 .PHONY: build test run clean stop check-style run-unit emojis
 
 BUILD_SERVER_DIR = ../mattermost-server
+EMOJI_TOOLS_DIR = ./build/emoji
 
 check-style: .yarninstall
 	@echo Checking for style guide compliance
@@ -8,7 +9,9 @@ check-style: .yarninstall
 	yarn run check
 
 test: .yarninstall
-	cd $(BUILD_SERVER_DIR) && $(MAKE) internal-test-web-client
+	@echo Running jest unit/component testing
+
+	yarn run test
 
 .yarninstall: package.json
 	@echo Getting dependencies using yarn
@@ -67,4 +70,6 @@ clean:
 	rm -f .yarninstall
 
 emojis:
-	./make-emojis
+	gem install bundler
+	bundle install --gemfile=$(EMOJI_TOOLS_DIR)/Gemfile
+	BUNDLE_GEMFILE=$(EMOJI_TOOLS_DIR)/Gemfile bundle exec $(EMOJI_TOOLS_DIR)/make-emojis

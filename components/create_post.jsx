@@ -272,9 +272,8 @@ export default class CreatePost extends React.Component {
 
     sendReaction(isReaction) {
         const action = isReaction[1];
-
         const emojiName = isReaction[2];
-        const postId = PostStore.getLatestPostId(this.state.channelId);
+        const postId = PostStore.getMostRecentPostIdInChannel(this.state.channelId);
 
         if (postId && action === '+') {
             PostActions.addReaction(this.state.channelId, postId, emojiName);
@@ -451,7 +450,7 @@ export default class CreatePost extends React.Component {
         if ((e.ctrlKey || e.metaKey) && e.keyCode === Constants.KeyCodes.FORWARD_SLASH) {
             e.preventDefault();
 
-            GlobalActions.showShortcutsModal();
+            GlobalActions.toggleShortcutsModal();
         }
     }
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {browserHistory} from 'react-router/es6';
+import {browserHistory} from 'react-router';
 
 import {createDirectChannel, getChannelAndMyMember, getChannelStats, getMyChannelMember, joinChannel, viewChannel} from 'mattermost-redux/actions/channels';
 import {getPostThread} from 'mattermost-redux/actions/posts';
@@ -196,7 +196,7 @@ export function showAccountSettingsModal() {
     });
 }
 
-export function showShortcutsModal() {
+export function toggleShortcutsModal() {
     AppDispatcher.handleViewAction({
         type: ActionTypes.TOGGLE_SHORTCUTS_MODAL,
         value: true
@@ -460,7 +460,7 @@ export function emitUserLoggedOutEvent(redirectTo = '/', shouldSignalLogout = tr
 }
 
 export function clientLogout(redirectTo = '/') {
-    BrowserStore.clear();
+    BrowserStore.clear({exclude: [Constants.RECENT_EMOJI_KEY, '__landingPageSeen__', 'selected_teams']});
     ErrorStore.clearLastError();
     ChannelStore.clear();
     stopPeriodicStatusUpdates();

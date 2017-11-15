@@ -1,7 +1,7 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {browserHistory} from 'react-router/es6';
+import {browserHistory} from 'react-router';
 import {batchActions} from 'redux-batched-actions';
 
 import {PostTypes} from 'mattermost-redux/action_types';
@@ -344,4 +344,15 @@ export function unpinPost(postId) {
 
 export function doPostAction(postId, actionId) {
     PostActions.doPostAction(postId, actionId)(dispatch, getState);
+}
+
+export function setEditingPost(postId = '', commentsCount = 0, refocusId = '', title = '') {
+    return async (doDispatch, doGetState) => {
+        doDispatch({
+            type: ActionTypes.SET_EDITING_POST,
+            data: {postId, commentsCount, refocusId, title}
+        }, doGetState);
+
+        return {data: true};
+    };
 }
