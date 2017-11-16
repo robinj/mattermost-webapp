@@ -25,13 +25,12 @@ export default class CalendarScheduler extends React.PureComponent {
             <div
                 className='calendar-scheduler'
             >
-                <h3 className='callout'>
-                    {'Drag the mouse over the calendar to select a date/time range.'}
-                </h3>
                 <BigCalendar
                     events={events}
                     selectable={true}
                     defaultView='week'
+                    step={15}
+                    timeslots={8}
                     scrollToTime={new Date()}
                     defaultDate={new Date()}
                     onSelectSlot={this.props.onDateSelect}

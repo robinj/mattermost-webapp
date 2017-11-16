@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.calendar-scheduler {
+    @include user-select(none);
+    background-color: #ffffff;
+    bottom: 80px;
+    border-radius: 3px;
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+    right: 100px;
+    position: absolute;
+    max-width: 600px;
+    z-index: 8;
+}
